@@ -4,11 +4,11 @@
       <h1>Založení nové hry</h1>
       <span class="radio" *ngFor="let gameType of gameTypes, let i = index">
         <label>
-          <input type="radio" [(ngModel)]="selectedGameType" name="radioGameType" value="{{i}}">
+          <input type="radio" [(ngModel)]="configuration.selectedGameType" name="radioGameType" value="{{i}}">
           {{gameType}}
         </label>
       </span>
-      <div *ngIf="selectedGameType == 3">
+      <div *ngIf="configuration.selectedGameType == 3">
         <div class="form-group">
           <label for="cols">Počet sloupečků</label>
           <input id="cols" type="number" class="form-control" [(ngModel)]="configuration.cols" name="cols">
@@ -22,7 +22,7 @@
           <input id="mines" type="number" class="form-control" [(ngModel)]="configuration.mines" name="mines">
         </div>
       </div>
-      <div *ngIf="radioChanged">
+      <div *ngIf="configuration.radioChanged">
         <button (click)="handleCreateGame()" class="btn btn-primary">Založit novou hru</button>
       </div>
     </div>

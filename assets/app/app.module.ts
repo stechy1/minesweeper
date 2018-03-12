@@ -8,11 +8,13 @@ import {GameCardComponent} from "./overview/game-card/game-card.component";
 import {NewComponent} from "./new/new.component";
 import {GameComponent} from "./game/game.component";
 import {FormsModule} from "@angular/forms";
+import {MinesweeperService} from "./minesweeper.service";
 
 const appRoutes: Routes = [
   {path: '', redirectTo: 'overview', pathMatch: 'full'},
   {path: 'overview', component: OverviewComponent},
   {path: 'new', component: NewComponent},
+  {path: 'game', redirectTo: 'overview', pathMatch: 'full'},
   {path: 'game/:id', component: GameComponent}
 ];
 
@@ -28,6 +30,9 @@ const appRoutes: Routes = [
     BrowserModule,
     FormsModule,
     RouterModule.forRoot(appRoutes)
+  ],
+  providers: [
+      MinesweeperService
   ],
   bootstrap: [
     AppComponent

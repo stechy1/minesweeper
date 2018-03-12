@@ -13,5 +13,16 @@
 </section>
 
 <div class="overview">
-  TODO zobrazit rozehrané hry
+  <div class="container">
+    <div class="row" *ngIf="games.length != 0">
+      <div class="col-sm-4" *ngFor="let g of games">
+        <a routerLink="/game/{{g.id}}" style="text-decoration: none">
+          <app-game-card [game]="g"></app-game-card>
+        </a>
+      </div>
+    </div>
+    <div class="row">
+      <p class="text-center" style="width: 100%">Nemáte žádné rozehrané hry.</p>
+    </div>
+  </div>
 </div>

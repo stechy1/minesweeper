@@ -1,4 +1,6 @@
 import { Component } from '@angular/core';
+import {MinesweeperService} from "../minesweeper.service";
+import {Router} from "@angular/router";
 
 @Component({
   selector: 'app-new',
@@ -14,17 +16,13 @@ export class NewComponent {
     'Expert',
     'Vlastní',
   ];
-  public radioChanged: boolean = false;
 
-  private _selectedGameType: number = 0;
+  constructor(private _service: MinesweeperService, private _router: Router) {}
 
-  get selectedGameType(): number {
-    return this._selectedGameType;
-  }
-
-  set selectedGameType(value: number) {
-    this._selectedGameType = value;
-    this.radioChanged = true;
+  public handleCreateGame() {
+    this._service.createNewGame(this.configuration.buildData()).then(id => {
+      this._router.navigate(['/game', id]);
+    })
   }
 }
 
@@ -32,7 +30,24 @@ class GameConfiguration {
   private _cols: number = 0;
   private _rows: number = 0;
   private _mines: number = 0;
+  private _selectedGameType: number = 0;
+  private _radioChanged: boolean = false;
 
+  private _rawTypes = [
+    'zacatecnik',
+    'pokrocily',
+    'expert',
+    'vlastni',
+  ];
+
+  buildData(): any {
+    return {
+      'obtiznost': this._rawTypes[this._selectedGameType],
+      'sloupcu': this._cols,
+      'radku': this._rows,
+      'min': this._mines
+    };
+  }
 
   get cols(): number {
     return this._cols;
@@ -56,5 +71,18 @@ class GameConfiguration {
 
   set mines(value: number) {
     this._mines = value;
+  }
+
+  get selectedGameType(): number {
+    return this._selectedGameType;
+  }
+
+  set selectedGameType(value: number) {
+    this._selectedGameType = value;
+    this._radioChanged = true;
+  }
+
+  get radioChanged(): boolean {
+    return this._radioChanged;
   }
 }
