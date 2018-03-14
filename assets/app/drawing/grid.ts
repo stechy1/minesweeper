@@ -21,11 +21,7 @@ export class Grid {
     }
 
     _getPoint(col, row): {
-        x: number, y: number
-        , topLeft: { x: number, y: number }
-        , topRight: { x: number, y: number }
-        , bottomLeft: { x: number, y: number }
-        , bottomRight: { x: number, y: number }
+        x: number, y: number, topLeft: { x: number, y: number }, topRight: { x: number, y: number }, bottomLeft: { x: number, y: number }, bottomRight: { x: number, y: number }
     } {
         return {
             x: (col * this._gapSize) + this._gapSize / 2,
@@ -52,16 +48,16 @@ export class Grid {
     _showHorizontalLines(): void {
         for (let row = 0; row <= this._rows; row++) {
             const pointY = row * this._gapSize;
-            this._drawer.drawLine({ x: 0, y: pointY }, { x: this.canvasWidth, y: pointY });
-            this._drawer.drawText('' + (row + 1), -this._gapSize, pointY + this._gapSize / 2 + this._gapSize / 4);
+            this._drawer.drawLine({x: 0, y: pointY}, {x: this.canvasWidth, y: pointY});
+            this._drawer.drawText('' + (row + 1), -this._gapSize / 2, pointY + 12);
         }
     }
 
     _showVerticalLines(): void {
         for (let col = 0; col <= this._cols; col++) {
             const pointX = col * this._gapSize;
-            this._drawer.drawLine({ x: pointX, y: 0 }, { x: pointX, y: this.canvasHeight });
-            this._drawer.drawText('' + (col + 1), pointX + this._gapSize / 5, -this._gapSize / 4);
+            this._drawer.drawLine({x: pointX, y: 0}, {x: pointX, y: this.canvasHeight});
+            this._drawer.drawText('' + (col + 1), pointX + this._gapSize / 2, -6);
         }
     }
 
@@ -96,10 +92,7 @@ export class Grid {
 
         for (let col = 0; col < this._cols; col++) {
             for (let row = 0; row < this._rows; row++) {
-                const gridPoint = this._points[col][row];
-                if (gridPoint.value === 1) {
-                    gridPoint.draw(this._drawer);
-                }
+                this._points[col][row].draw(this._drawer);
             }
         }
     }
@@ -125,15 +118,15 @@ export class Grid {
         return point;
     }
 
-    togglePoint(point: { col: number, row: number }): void {
-        this.points[point.col][point.row].togglePoint();
-    }
-
-    loadPoints(points: any): void {
+    loadPoints(data: any): void {
         this.clear();
-        points.forEach((point) => {
-            this.togglePoint(point);
-        });
+        for (let row = 0; row < data.length; row++) {
+            const rowArray = data[row]['radek_oblasti'].split('');
+            for (let col = 0; col < rowArray.length; col++) {
+                const value = rowArray[col];
+                this._points[col][row].value = value;
+            }
+        }
     }
 
     savePoints(): Array<{ col: number, row: number }> {
@@ -142,7 +135,7 @@ export class Grid {
             for (let row = 0; row < this._rows; row++) {
                 const gridPoint = this._points[col][row];
                 if (gridPoint.value === 1) {
-                    points.push({ col: gridPoint.col, row: gridPoint.row });
+                    points.push({col: gridPoint.col, row: gridPoint.row});
                 }
             }
         }

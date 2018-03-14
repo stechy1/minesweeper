@@ -1,91 +1,107 @@
-import {Component, ElementRef, OnDestroy, OnInit, ViewChild} from '@angular/core';
-import {ActivatedRoute} from "@angular/router";
-import {MinesweeperService} from "../minesweeper.service";
-import {Subscription} from "rxjs/Subscription";
-import {Drawer} from "../drawing/drawer";
-import {Grid} from "../drawing/grid";
+import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { ActivatedRoute } from "@angular/router";
+import { MinesweeperService } from "../minesweeper.service";
+import { Subscription } from "rxjs/Subscription";
+import { Drawer } from "../drawing/drawer";
+import { Grid } from "../drawing/grid";
 
 @Component({
-  selector: 'app-game',
-  templateUrl: './game.component.html',
-  styleUrls: ['./game.component.css']
+    selector: 'app-game',
+    templateUrl: './game.component.html',
+    styleUrls: ['./game.component.css']
 })
 export class GameComponent implements OnInit, OnDestroy {
 
-  private _routeSub: Subscription;
-  private _gameDataSub: Subscription;
+    private _routeSub: Subscription;
+    private _gameDataSub: Subscription;
+    private _errorSub: Subscription;
 
-  @ViewChild('game_canvas')
-  private _canvas: ElementRef;
-  private _grid: Grid;
-  private _areaId;
+    @ViewChild('game_canvas')
+    private _canvas: ElementRef;
+    private _grid: Grid;
+    private _areaId: number;
+    private _minesCount: number;
+    private _minesRemaining: number;
+    private _dificulty: string;
 
-  constructor(private _service: MinesweeperService, private _route: ActivatedRoute) {}
+    constructor(private _service: MinesweeperService, private _route: ActivatedRoute) {
+    }
 
-  _mousePosRelative(event: MouseEvent): { x: number, y: number } {
-    const rect = this._canvas.nativeElement.getBoundingClientRect();
-    return { x: event.clientX - rect.left, y: event.clientY - rect.top };
-  }
+    _mousePosRelative(event: MouseEvent): { x: number, y: number } {
+        const rect = this._canvas.nativeElement.getBoundingClientRect();
+        return {x: event.clientX - rect.left, y: event.clientY - rect.top};
+    }
 
-  _redrawCanvas(): void {
-    this._grid.drawer.push();
-    this._grid.showGrid();
-    this._grid.drawer.pop();
-  }
+    _redrawCanvas(): void {
+        this._grid.drawer.push();
+        this._grid.showGrid();
+        this._grid.drawer.pop();
+    }
 
-  ngOnInit(): void {
-    const drawer = new Drawer(this._canvas.nativeElement.getContext('2d'));
+    ngOnInit(): void {
+        const drawer = new Drawer(this._canvas.nativeElement.getContext('2d'));
 
-    this._routeSub = this._route.paramMap.subscribe(params => {
-      this._areaId = +params.get('id');
-      this._service.getAreaInfo(this._areaId)
-        .then(info => {
-          const sloupcu = info['sloupcu'];
-          const radku = info['radku'];
-          const min = info['min'];
-          const obtiznost = info['obtiznost'];
-
-          this._grid = new Grid(drawer, sloupcu, radku, 20);
-          this._canvas.nativeElement.width = this._grid.canvasWidth;
-          this._canvas.nativeElement.height = this._grid.canvasHeight;
-          this._redrawCanvas();
-
-          this._gameDataSub = this._service.getGameData(this._areaId).subscribe(data => {
-            console.log(data);
-          });
+        this._errorSub = this._service.errorListener().subscribe(err => {
+            console.log(err);
         });
-    });
-  }
 
-  ngOnDestroy(): void {
-    this._routeSub.unsubscribe();
-    this._gameDataSub.unsubscribe();
-  }
+        this._routeSub = this._route.paramMap.subscribe(params => {
+            this._areaId = +params.get('id');
+            this._service.getAreaInfo(this._areaId)
+            .then(info => {
+                const sloupcu = info['sloupcu'];
+                const radku = info['radku'];
+                this._minesCount = info['min'];
+                this._dificulty = info['obtiznost'];
 
-  handleClick(e: MouseEvent): boolean {
-    const coord = this._mousePosRelative(e);
-    if (this._grid.isMouseInGridmouse(coord)) {
-      const point = this._grid.mouseToPoint(coord);
-      this._service.markEmpty(this._areaId, point.col, point.row);
+                this._grid = new Grid(drawer, sloupcu, radku, 20);
+                this._canvas.nativeElement.width = this._grid.canvasWidth;
+                this._canvas.nativeElement.height = this._grid.canvasHeight;
+                this._redrawCanvas();
+
+                this._gameDataSub = this._service.getGameData(this._areaId).subscribe(data => {
+                    console.log(data);
+                    this._grid.loadPoints(data);
+                    this._redrawCanvas();
+                });
+            });
+        });
     }
-    return false;
-  }
 
-  handleContextMenu(e: MouseEvent): boolean {
-    console.log(e);
-    return false;
-  }
-
-  handleMove(e: MouseEvent): void {
-    const coord = this._mousePosRelative(e);
-    if (this._grid.isMouseInGridmouse(coord)) {
-      this._grid.highlighted = this._grid.mouseToPoint(coord);
-      this._redrawCanvas();
+    ngOnDestroy(): void {
+        this._routeSub.unsubscribe();
+        this._gameDataSub.unsubscribe();
+        this._errorSub.unsubscribe();
     }
-  }
 
-  handleLeave(): void {
-    this._grid.highlighted = null;
-    this._redrawCanvas();
-  }
+    handleClick(e: MouseEvent): boolean {
+        const coord = this._mousePosRelative(e);
+        if (this._grid.isMouseInGridmouse(coord)) {
+            const point = this._grid.mouseToPoint(coord);
+            this._service.markEmpty(this._areaId, point.col + 1, point.row + 1);
+        }
+        return false;
+    }
+
+    handleContextMenu(e: MouseEvent): boolean {
+        const coord = this._mousePosRelative(e);
+        if (this._grid.isMouseInGridmouse(coord)) {
+            const point = this._grid.mouseToPoint(coord);
+            this._service.toggleMine(this._areaId, point.col + 1, point.row + 1);
+        }
+        return false;
+    }
+
+    handleMove(e: MouseEvent): void {
+        const coord = this._mousePosRelative(e);
+        if (this._grid.isMouseInGridmouse(coord)) {
+            this._grid.highlighted = this._grid.mouseToPoint(coord);
+            this._redrawCanvas();
+        }
+    }
+
+    handleLeave(): void {
+        this._grid.highlighted = null;
+        this._redrawCanvas();
+    }
 }

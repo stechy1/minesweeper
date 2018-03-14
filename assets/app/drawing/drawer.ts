@@ -1,6 +1,6 @@
 export class Drawer {
 
-    constructor(private _ctx: CanvasRenderingContext2D) { 
+    constructor(private _ctx: CanvasRenderingContext2D) {
         this.lineWidth = 1;
         this.strokeStyle = 'white';
         this.fillStyle = 'white';
@@ -60,7 +60,8 @@ export class Drawer {
     }
 
     drawText(text: string, x: number, y: number): void {
-        this._ctx.strokeText(text, x, y);
+        const measure = this._ctx.measureText(text);
+        this._ctx.strokeText(text, x - measure.width / 2, y + 3);
     }
 
     clear(): void {
