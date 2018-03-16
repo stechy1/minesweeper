@@ -50,7 +50,10 @@ function handler(socket) {
         .then(res => {
             client.query("SELECT currval('oblast_id_seq');")
             .then(res2 => {
-                socket.emit('new-game-done', {id: res2.rows[0]['currval']});
+                const id = res2.rows[0]['currval'];
+                socket.emit('new-game-done', {id: id});
+                data['id'] = id;
+                socket.broadcast.emit('dashboard-done', [data]);
             }).catch(err => {
                 console.error(err);
             })
@@ -125,6 +128,13 @@ function handler(socket) {
             console.error(err);
         });
 
+    });
+
+    socket.on('clear', async () => {
+        await client.query("TRUNCATE tah RESTART IDENTITY CASCADE");
+        await client.query("TRUNCATE mina RESTART IDENTITY CASCADE");
+        await client.query("TRUNCATE hra RESTART IDENTITY CASCADE");
+        await client.query("TRUNCATE oblast RESTART IDENTITY CASCADE");
     });
 }
 

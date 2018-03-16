@@ -66,4 +66,8 @@ export class MinesweeperService {
             });
         });
     }
+
+    clearGames(): void {
+        this._socket.emit('clear');
+    }
 }

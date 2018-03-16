@@ -24,4 +24,9 @@ export class OverviewComponent implements OnInit, OnDestroy {
     ngOnDestroy(): void {
         this.games = [];
     }
+
+    handleClear(): void {
+        this._service.clearGames();
+        this.games = [];
+    }
 }
