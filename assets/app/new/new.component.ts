@@ -1,13 +1,16 @@
-import { Component } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { MinesweeperService } from "../minesweeper.service";
 import { Router } from "@angular/router";
+import { Subscription } from "rxjs/Subscription";
 
 @Component({
     selector: 'app-new',
     templateUrl: './new.component.html',
     styleUrls: ['./new.component.css']
 })
-export class NewComponent {
+export class NewComponent  implements OnInit, OnDestroy {
+
+    private _errorSub: Subscription;
 
     public configuration: GameConfiguration = new GameConfiguration();
     public gameTypes = [
@@ -18,6 +21,16 @@ export class NewComponent {
     ];
 
     constructor(private _service: MinesweeperService, private _router: Router) {
+    }
+
+    ngOnInit(): void {
+        this._errorSub = this._service.errorListener().subscribe(err => {
+            console.log(err);
+        });
+    }
+
+    ngOnDestroy(): void {
+        this._errorSub.unsubscribe();
     }
 
     public handleCreateGame() {

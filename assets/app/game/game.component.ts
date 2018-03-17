@@ -23,6 +23,7 @@ export class GameComponent implements OnInit, OnDestroy {
     private _minesCount: number;
     private _minesRemaining: number;
     private _dificulty: string;
+    private _gameState: number = 0;
 
     constructor(private _service: MinesweeperService, private _route: ActivatedRoute) {
     }
@@ -61,6 +62,7 @@ export class GameComponent implements OnInit, OnDestroy {
 
                 this._gameDataSub = this._service.getGameData(this._areaId).subscribe(data => {
                     console.log(data);
+                    this._gameState = data[0]['id_stav'];
                     this._grid.loadPoints(data);
                     this._redrawCanvas();
                 });
@@ -72,6 +74,10 @@ export class GameComponent implements OnInit, OnDestroy {
         this._routeSub.unsubscribe();
         this._gameDataSub.unsubscribe();
         this._errorSub.unsubscribe();
+    }
+
+    get gameState(): number {
+        return this._gameState;
     }
 
     handleClick(e: MouseEvent): boolean {

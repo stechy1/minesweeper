@@ -1,19 +1,19 @@
-const {Client} = require('pg');
+const {Pool} = require('pg');
 
 const settings = {
     user: 'petr',
-    host: 'localhost',
+    host: '192.168.1.116',
     database: 'petr',
     password: '',
     port: 5432,
 };
+const pool = new Pool(settings);
 
-function handler(socket) {
-    const client = new Client(settings);
-    client.connect();
+async function handler(socket) {
+    const client = await pool.connect();
     socket.on('disconnect', () => {
         console.log('user disconnected');
-        client.end();
+        client.release();
     });
 
     function sendGameData(oblastId) {
@@ -59,6 +59,7 @@ function handler(socket) {
             })
         }).catch(err => {
             console.error(err);
+            socket.emit('chyba', err.hint);
         });
     })
 
@@ -102,12 +103,8 @@ function handler(socket) {
             sendGameData(data['oblastId']);
         }).catch(err => {
             console.error(err);
-            if (err.code === '23505') {
-                socket.emit('error', 'Pole nelze znovu označit');
-            }
-
-            throw new Error(err);
-        }).catch(err => {});
+            socket.emit('chyba', err.hint);
+        });
     });
 
     /**
@@ -126,8 +123,8 @@ function handler(socket) {
             sendGameData(data['oblastId']);
         }).catch(err => {
             console.error(err);
+            socket.emit('chyba', err.hint);
         });
-
     });
 
     socket.on('clear', async () => {

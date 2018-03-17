@@ -3,4 +3,13 @@
     <canvas #game_canvas on-click="handleClick($event)" (mousemove)="handleMove($event)"
             (mouseleave)="handleLeave($event)" (contextmenu)="handleContextMenu($event)"></canvas>
   </div>
+
+  <div *ngIf="gameState > 1">
+    <div *ngIf="gameState == 2">
+      <p>Gratuluji k výhře</p>
+    </div>
+    <div *ngIf="gameState == 3">
+      <p>Bohužel jste prohrál</p>
+    </div>
+  </div>
 </div>

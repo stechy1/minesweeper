@@ -61,7 +61,7 @@ export class MinesweeperService {
 
     errorListener(): Observable<void> {
         return new Observable<void>(observer => {
-            this._socket.on('error', data => {
+            this._socket.on('chyba', data => {
                 observer.next(data);
             });
         });
