@@ -21,7 +21,8 @@ async function handler(socket) {
         client.query('SELECT * FROM oblast_tisk WHERE id_oblasti = $1',
             [oblastId])
         .then(res => {
-            socket.emit('game-data-done', res.rows);
+            socket.emit('game-data-done', {oblastId: oblastId, rows: res.rows});
+            socket.broadcast.emit('game-data-done', {oblastId: oblastId, rows: res.rows});
         }).catch(err => {
             console.error(err);
         });

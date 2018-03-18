@@ -43,7 +43,8 @@ export class MinesweeperService {
     getGameData(oblastId: number): Observable<Array<any>> {
         return new Observable<Array<any>>(observer => {
             this._socket.on('game-data-done', data => {
-                observer.next(data);
+                if (data['oblastId'] == oblastId)
+                observer.next(data['rows']);
             });
 
             this._socket.emit('game-data', {oblastId: oblastId});

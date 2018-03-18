@@ -13,13 +13,11 @@ export class OverviewComponent implements OnInit, OnDestroy {
     constructor(private _service: MinesweeperService) {
     }
 
-
     ngOnInit(): void {
         this._service.playableGames().subscribe((rows: any) => {
             this.games = this.games.concat(rows);
         });
     }
-
 
     ngOnDestroy(): void {
         this.games = [];
@@ -28,5 +26,10 @@ export class OverviewComponent implements OnInit, OnDestroy {
     handleClear(): void {
         this._service.clearGames();
         this.games = [];
+    }
+
+    handleGameEnd(oblastId: number) {
+        const index = this.games.map(game => game.id).indexOf(oblastId);
+        this.games.splice(index, 1);
     }
 }

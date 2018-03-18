@@ -17,7 +17,7 @@
     <div class="row" *ngIf="games.length != 0">
       <div class="col-sm-4" *ngFor="let g of games">
         <a routerLink="/game/{{g.id}}" style="text-decoration: none">
-          <app-game-card [game]="g"></app-game-card>
+          <app-game-card [game]="g" (onGameEnd)="handleGameEnd(+g.id)"></app-game-card>
         </a>
       </div>
     </div>
