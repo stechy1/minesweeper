@@ -49,13 +49,16 @@ async function handler(socket) {
         client.query(
             'INSERT INTO oblast (sloupcu, radku, min, obtiznost) VALUES ($1, $2, $3, $4)',
             [data['sloupcu'], data['radku'], data['min'], data['obtiznost']])
-        .then(res => {
+        .then(() => {
             client.query("SELECT currval('oblast_id_seq');")
             .then(res2 => {
                 const id = res2.rows[0]['currval'];
                 socket.emit('new-game-done', {id: id});
                 data['id'] = id;
-                socket.broadcast.emit('dashboard-done', [data]);
+                client.query('SELECT * FROM rozehrane_hry WHERE id = $1', [id])
+                .then(res3 => {
+                    socket.broadcast.emit('dashboard-done', [res3.rows[0]]);
+                });
             }).catch(err => {
                 console.error(err);
             })
@@ -144,10 +147,11 @@ async function handler(socket) {
     });
 
     socket.on('clear', async () => {
-        await client.query("TRUNCATE tah RESTART IDENTITY CASCADE");
-        await client.query("TRUNCATE mina RESTART IDENTITY CASCADE");
-        await client.query("TRUNCATE hra RESTART IDENTITY CASCADE");
-        await client.query("TRUNCATE oblast RESTART IDENTITY CASCADE");
+        await client.query("TRUNCATE hra CASCADE");
+        await client.query("TRUNCATE mina CASCADE");
+        await client.query("TRUNCATE oblast CASCADE");
+        await client.query("TRUNCATE pole CASCADE");
+        await client.query("TRUNCATE tah CASCADE");
     });
 }
 
