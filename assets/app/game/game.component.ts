@@ -1,9 +1,10 @@
 import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { ActivatedRoute } from "@angular/router";
+import { ActivatedRoute, Router } from "@angular/router";
 import { MinesweeperService } from "../minesweeper.service";
 import { Subscription } from "rxjs/Subscription";
 import { Drawer } from "../drawing/drawer";
 import { Grid } from "../drawing/grid";
+import { Title } from "@angular/platform-browser";
 
 @Component({
     selector: 'app-game',
@@ -25,7 +26,8 @@ export class GameComponent implements OnInit, OnDestroy {
     private _dificulty: string;
     private _gameState: number = 0;
 
-    constructor(private _service: MinesweeperService, private _route: ActivatedRoute) {
+    constructor(private _service: MinesweeperService, private _route: ActivatedRoute,
+                private _router: Router, private _title: Title) {
     }
 
     _mousePosRelative(event: MouseEvent): { x: number, y: number } {
@@ -48,6 +50,7 @@ export class GameComponent implements OnInit, OnDestroy {
 
         this._routeSub = this._route.paramMap.subscribe(params => {
             this._areaId = +params.get('id');
+            this._title.setTitle(`Hledání min - Hra č. ${this._areaId}`);
             this._service.getAreaInfo(this._areaId)
             .then(info => {
                 const sloupcu = info['sloupcu'];
@@ -66,14 +69,18 @@ export class GameComponent implements OnInit, OnDestroy {
                     this._grid.loadPoints(data);
                     this._redrawCanvas();
                 });
+            }).catch(() => {
+                this._router.navigate([""]);
             });
         });
     }
 
     ngOnDestroy(): void {
         this._routeSub.unsubscribe();
-        this._gameDataSub.unsubscribe();
         this._errorSub.unsubscribe();
+        if (this._gameDataSub) {
+            this._gameDataSub.unsubscribe();
+        }
     }
 
     get gameState(): number {

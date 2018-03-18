@@ -2,6 +2,7 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { MinesweeperService } from "../minesweeper.service";
 import { Router } from "@angular/router";
 import { Subscription } from "rxjs/Subscription";
+import { Title } from "@angular/platform-browser";
 
 @Component({
     selector: 'app-new',
@@ -20,10 +21,12 @@ export class NewComponent  implements OnInit, OnDestroy {
         'Vlastní',
     ];
 
-    constructor(private _service: MinesweeperService, private _router: Router) {
+    constructor(private _service: MinesweeperService, private _router: Router,
+                private _title: Title) {
     }
 
     ngOnInit(): void {
+        this._title.setTitle("Hledání min - Nová hra");
         this._errorSub = this._service.errorListener().subscribe(err => {
             console.log(err);
         });

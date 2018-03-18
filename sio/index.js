@@ -78,6 +78,9 @@ async function handler(socket) {
             'SELECT oblast.radku, oblast.sloupcu, oblast.min, oblast.obtiznost, (SELECT COUNT(mina.cas) FROM pole INNER JOIN mina ON mina.id_pole = pole.id WHERE pole.id_oblasti = $1) AS oznacenych_min FROM oblast WHERE id = $1',
             [data['oblastId']])
         .then(res => {
+            if (res.rows.length == 0) {
+                socket.emit('area-info-dona');
+            }
             socket.emit('area-info-done', res.rows[0]);
         }).catch(err => {
             console.error(err);
@@ -152,6 +155,9 @@ async function handler(socket) {
         await client.query("TRUNCATE oblast CASCADE");
         await client.query("TRUNCATE pole CASCADE");
         await client.query("TRUNCATE tah CASCADE");
+        await client.query("SELECT setval('public.hra_id_seq', 1, true)");
+        await client.query("SELECT setval('public.oblast_id_seq', 1, true)");
+        await client.query("SELECT setval('public.pole_id_seq', 1, true)");
     });
 }
 

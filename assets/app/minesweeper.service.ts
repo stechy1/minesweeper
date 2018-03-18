@@ -32,9 +32,14 @@ export class MinesweeperService {
     }
 
     getAreaInfo(oblastId: number): Promise<void> {
-        return new Promise<void>(resolve => {
+        return new Promise<void>((resolve, reject) => {
             this._socket.on('area-info-done', data => {
-                resolve(data);
+                if (!data) {
+                    reject();
+                } else {
+                    resolve(data);
+                }
+                //resolve(data);
             });
             this._socket.emit('area-info', {oblastId: oblastId});
         })
