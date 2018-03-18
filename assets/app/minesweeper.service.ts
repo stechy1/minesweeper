@@ -51,6 +51,24 @@ export class MinesweeperService {
 
     }
 
+    getWinners(): Promise<Array<any>> {
+        return new Promise<Array<any>>(resolve => {
+            this._socket.on('win-done', data => {
+                resolve(data);
+            });
+            this._socket.emit('win');
+        });
+    }
+
+    getLoosers(): Promise<Array<any>> {
+        return new Promise<Array<any>>(resolve => {
+            this._socket.on('loose-done', data => {
+                resolve(data);
+            });
+            this._socket.emit('loose');
+        });
+    }
+
     markEmpty(oblastId: number, sloupecek: number, radek: number): void {
         this._socket.emit('tah', {oblastId: oblastId, sloupecek: sloupecek, radek: radek});
     }

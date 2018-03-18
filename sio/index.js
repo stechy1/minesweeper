@@ -10,6 +10,7 @@ const settings = {
 const pool = new Pool(settings);
 
 async function handler(socket) {
+    console.log('Připojil se nový klient');
     const client = await pool.connect();
     socket.on('disconnect', () => {
         console.log('user disconnected');
@@ -86,6 +87,20 @@ async function handler(socket) {
      */
     socket.on('game-data', data => {
         sendGameData(data['oblastId']);
+    });
+
+    socket.on('win', () => {
+        client.query('SELECT * FROM vitezove')
+        .then(res => {
+            socket.emit('win-done', res.rows);
+        })
+    });
+
+    socket.on('loose', () => {
+        client.query('SELECT * FROM porazeni')
+        .then(res => {
+            socket.emit('loose-done', res.rows);
+        })
     });
 
     /**

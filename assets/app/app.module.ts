@@ -9,22 +9,27 @@ import { NewComponent } from "./new/new.component";
 import { GameComponent } from "./game/game.component";
 import { FormsModule } from "@angular/forms";
 import { MinesweeperService } from "./minesweeper.service";
+import { ScoreboardComponent } from "./scoreboard/scoreboard.component";
+import { PgTimePipe } from "./pg-time.pipe";
 
 const appRoutes: Routes = [
     {path: '', redirectTo: 'overview', pathMatch: 'full'},
     {path: 'overview', component: OverviewComponent},
     {path: 'new', component: NewComponent},
     {path: 'game', redirectTo: 'overview', pathMatch: 'full'},
-    {path: 'game/:id', component: GameComponent}
+    {path: 'game/:id', component: GameComponent},
+    {path: 'scoreboard', component: ScoreboardComponent},
 ];
 
 @NgModule({
     declarations: [
+        PgTimePipe,
         AppComponent,
         OverviewComponent,
         GameCardComponent,
         NewComponent,
-        GameComponent
+        GameComponent,
+        ScoreboardComponent
     ],
     imports: [
         BrowserModule,
