@@ -12,10 +12,10 @@ export class Grid {
     }
 
     _prepareGrid(): void {
-        for (let col = 0; col < this._cols; col++) {
-            this._points[col] = [];
-            for (let row = 0; row < this._rows; row++) {
-                this._points[col][row] = new GridPoint(col, row, this._getPoint(col, row));
+        for (let row = 0; row < this._rows; row++) {
+            this._points[row] = [];
+            for (let col = 0; col < this._cols; col++) {
+                this._points[row][col] = new GridPoint(col, row, this._getPoint(col, row));
             }
         }
     }
@@ -70,9 +70,9 @@ export class Grid {
     }
 
     clear(): void {
-        for (let col = 0; col < this._cols; col++) {
-            for (let row = 0; row < this._rows; row++) {
-                const gridPoint = this._points[col][row];
+        for (let row = 0; row < this._rows; row++) {
+            for (let col = 0; col < this._cols; col++) {
+                const gridPoint = this._points[row][col];
                 gridPoint.reset();
             }
         }
@@ -90,9 +90,9 @@ export class Grid {
             this._highlight(this._highlighted.col, this._highlighted.row);
         }
 
-        for (let col = 0; col < this._cols; col++) {
-            for (let row = 0; row < this._rows; row++) {
-                this._points[col][row].draw(this._drawer);
+        for (let row = 0; row < this._rows; row++) {
+            for (let col = 0; col < this._cols; col++) {
+                this._points[row][col].draw(this._drawer);
             }
         }
     }
@@ -124,7 +124,7 @@ export class Grid {
             const rowArray = data[row]['radek_oblasti'].split('');
             for (let col = 0; col < rowArray.length; col++) {
                 const value = rowArray[col];
-                this._points[col][row].value = value;
+                this._points[row][col].value = value;
             }
         }
     }
@@ -144,11 +144,11 @@ export class Grid {
     }
 
     get canvasWidth() {
-        return this._rows * this._gapSize + this._gapSize + 1;
+        return this._cols * this._gapSize + this._gapSize + 1;
     }
 
     get canvasHeight() {
-        return this._cols * this._gapSize + this._gapSize + 1;
+        return this._rows * this._gapSize + this._gapSize + 1;
     }
 
     get drawer(): Drawer {
