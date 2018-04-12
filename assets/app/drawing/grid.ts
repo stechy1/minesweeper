@@ -61,10 +61,10 @@ export class Grid {
         }
     }
 
-    _highlight(col: number, row: number): void {
+    _highlight(col: number, row: number, color: string = 'rgb(234, 222, 239)'): void {
         const point = this._getPoint(col, row);
         this._drawer.push();
-        this._drawer.fillStyle = 'rgb(234, 222, 239)';
+        this._drawer.fillStyle = color;
         this._drawer.fillRectangle(point.topLeft.x + 1, point.topLeft.y + 1, this._gapSize - 3, this._gapSize - 3);
         this._drawer.pop();
     }
@@ -92,7 +92,11 @@ export class Grid {
 
         for (let row = 0; row < this._rows; row++) {
             for (let col = 0; col < this._cols; col++) {
-                this._points[row][col].draw(this._drawer);
+                const point = this._points[row][col];
+                if (point.isBadMine) {
+                    this._highlight(col, row, 'red');
+                }
+                point.draw(this._drawer);
             }
         }
     }
@@ -127,6 +131,12 @@ export class Grid {
                 this._points[row][col].value = value;
             }
         }
+    }
+
+    loadBadMines(mines: any[]): void {
+        mines.forEach(value => {
+            this._points[value.y-1][value.x-1].badMine();
+        })
     }
 
     savePoints(): Array<{ col: number, row: number }> {

@@ -39,6 +39,14 @@ export class GameComponent implements OnInit, OnDestroy {
         this._grid.drawer.pop();
     }
 
+    _getBadMines(): void {
+        this._service.getBadMines(this._areaId)
+            .then(value => {
+                this._grid.loadBadMines(value);
+                this._redrawCanvas();
+            });
+    }
+
     ngOnInit(): void {
         const drawer = new Drawer(this._canvas.nativeElement.getContext('2d'));
 
@@ -46,25 +54,30 @@ export class GameComponent implements OnInit, OnDestroy {
             console.log(err);
         });
 
+        const self = this;
+
         this._routeSub = this._route.paramMap.subscribe(params => {
-            this._areaId = +params.get('id');
-            this._service.getAreaInfo(this._areaId)
+            self._areaId = +params.get('id');
+            self._service.getAreaInfo(self._areaId)
             .then(info => {
                 const sloupcu = info['sloupcu'];
                 const radku = info['radku'];
-                this._minesCount = info['min'];
-                this._dificulty = info['obtiznost'];
+                self._minesCount = info['min'];
+                self._dificulty = info['obtiznost'];
 
-                this._grid = new Grid(drawer, sloupcu, radku, 20);
-                this._canvas.nativeElement.width = this._grid.canvasWidth;
-                this._canvas.nativeElement.height = this._grid.canvasHeight;
-                this._redrawCanvas();
+                self._grid = new Grid(drawer, sloupcu, radku, 20);
+                self._canvas.nativeElement.width = self._grid.canvasWidth;
+                self._canvas.nativeElement.height = self._grid.canvasHeight;
+                self._redrawCanvas();
 
-                this._gameDataSub = this._service.getGameData(this._areaId).subscribe(data => {
+                self._gameDataSub = self._service.getGameData(self._areaId).subscribe(data => {
                     console.log(data);
-                    this._gameState = data[0]['id_stav'];
-                    this._grid.loadPoints(data);
-                    this._redrawCanvas();
+                    self._gameState = data[0]['id_stav'];
+                    self._grid.loadPoints(data);
+                    self._redrawCanvas();
+                    if (self._gameState == 3) {
+                        self._getBadMines();
+                    }
                 });
             });
         });
