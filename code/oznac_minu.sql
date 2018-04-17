@@ -1,0 +1,1 @@
+INSERT INTO mina SELECT pole.id as id_pole FROM pole WHERE pole.id_oblasti = $1 AND pole.x = $2 and pole.y = $3

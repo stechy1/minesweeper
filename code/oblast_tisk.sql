@@ -1,0 +1,1 @@
+SELECT * FROM oblast_tisk WHERE id_oblasti = $1
