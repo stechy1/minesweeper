@@ -6,6 +6,9 @@ import { Pipe, PipeTransform } from "@angular/core";
 export class PgTimePipe implements PipeTransform {
 
     transform(value: any, ...args): any {
+        if (!value) {
+            return '?';
+        }
         Object.keys(value).forEach((key) => {
             let val: number | string = +value[key];
             if (val < 10) {

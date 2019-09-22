@@ -75,6 +75,15 @@ export class MinesweeperService {
         });
     }
 
+    getBadMines(oblastId: number): Promise<Array<any>> {
+        return new Promise<Array<any>>(resolve => {
+            this._socket.on('bad-mines-done', data => {
+                resolve(data);
+            });
+            this._socket.emit('bad-mines', {oblastId: oblastId});
+        });
+    }
+
     markEmpty(oblastId: number, sloupecek: number, radek: number): void {
         this._socket.emit('tah', {oblastId: oblastId, sloupecek: sloupecek, radek: radek});
     }
